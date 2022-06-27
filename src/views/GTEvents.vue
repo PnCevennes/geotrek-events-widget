@@ -30,23 +30,61 @@
 <script>
 export default {
   data: () => ({
-    events: {},
+    events: [],
+    eventsStore: [],
+    loading: true
   }),
   mounted() {
-    this.gta_url = this.$route.query.gta_url || 'https://geotrekdemo.ecrins-parcnational.fr';
+    this.gta_url = this.$route.query.gta_url || 'https://geotrek-admin.cevennes-parcnational.net';
+    this.event_api_url = `${this.gta_url}/api/v2/touristicevent/?limit=id,begin_date,name.fr`
+
     this.getEvents();
   },
+  watch: {
+    // whenever question changes, this function will run
+    loading(newV) {
+      if (newV === false) {
+        // Order data
+        this.events = this.eventsStore.map(obj => {
+          return { ...obj, date: new Date(obj.begin_date) };
+        }).sort((a, b) => Number(a.date) - Number(b.date));
+        console.log(this.events);
+      }
+    }
+  },
   methods: {
+    testNexData(data) {
+      console.log(data.results);
+      this.eventsStore.push(...data.results);
+      if (data.next) {
+        this.requestNextPage(data.next);
+      }
+      else {
+        this.loading = false;
+      }
+    },
 
-    getEvents() {
-      fetch(`${this.gta_url}/api/v2/touristicevent/`)
+    requestNextPage(urlNext) {
+      return fetch(urlNext, {
+        method: 'GET'
+      })
         .then(response => {
           return response.json();
         })
         .then(data => {
-          // Order data
-
-          this.events = data.results.sort((a, b) => a.begin_date - b.begin_date);
+          this.testNexData(data);
+        })
+        .catch(err => {
+          console.log(`Error: ${err}`)
+        });
+    },
+    getEvents() {
+      fetch(this.event_api_url)
+        .then(response => {
+          return response.json();
+        })
+        .then(data => {
+          this.testNexData(data);
         });
     }
   }
