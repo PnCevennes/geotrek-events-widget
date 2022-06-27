@@ -6,7 +6,7 @@
           src="https://cdn.pixabay.com/photo/2020/07/12/07/47/bee-5396362_1280.jpg">
           <v-card-title class="white--text mt-8">
             <p class="ml-3">
-              Les animations du Parc
+              Animations à venir
             </p>
           </v-card-title>
         </v-img>
