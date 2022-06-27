@@ -48,7 +48,17 @@ export default {
     this.gta_url = this.$route.query.gta_url || 'https://geotrek-admin.cevennes-parcnational.net';
     this.gtr_url = this.$route.query.gtr_url || 'https://destination.cevennes-parcnational.fr';
     this.event_api_url = `${this.gta_url}/api/v2/touristicevent/?limit=id,begin_date,end_date,name.fr`
-
+    this.other_query_params = {}
+    if (this.$route.query.portal) {
+      this.other_query_params['portal'] = this.$route.query.portal
+    }
+    if (this.$route.query.nb_days) {
+      var dates_after = new Date();
+      var dates_before = new Date();
+      dates_before.setDate(dates_after.getDate() + parseInt(this.$route.query.nb_days));
+      this.other_query_params['dates_after'] = dates_after.toISOString().split('T')[0]
+      this.other_query_params['dates_before'] = dates_before.toISOString().split('T')[0]
+    }
     this.getEvents();
   },
   watch: {
@@ -64,8 +74,7 @@ export default {
     }
   },
   methods: {
-    testNexData(data) {
-      console.log(data.results);
+    processEventData(data) {
       this.eventsStore.push(...data.results);
       if (data.next) {
         this.requestNextPage(data.next);
@@ -83,19 +92,24 @@ export default {
           return response.json();
         })
         .then(data => {
-          this.testNexData(data);
+          this.processEventData(data);
         })
         .catch(err => {
           console.log(`Error: ${err}`)
         });
     },
+
     getEvents() {
-      fetch(this.event_api_url)
+      const queryString = Object.keys(this.other_query_params).map((key) => {
+        return encodeURIComponent(key) + '=' + encodeURIComponent(this.other_query_params[key])
+      }).join('&');
+
+      fetch(this.event_api_url + '&' + queryString)
         .then(response => {
           return response.json();
         })
         .then(data => {
-          this.testNexData(data);
+          this.processEventData(data);
         });
     }
   }
