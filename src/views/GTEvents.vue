@@ -46,7 +46,7 @@ export default {
   }),
   mounted() {
     this.gta_url = this.$route.query.gta_url || 'https://geotrek-admin.cevennes-parcnational.net';
-    this.gtr_url = this.$route.query.gta_url || 'https://destination.cevennes-parcnational.fr';
+    this.gtr_url = this.$route.query.gtr_url || 'https://destination.cevennes-parcnational.fr';
     this.event_api_url = `${this.gta_url}/api/v2/touristicevent/?limit=id,begin_date,end_date,name.fr`
 
     this.getEvents();
