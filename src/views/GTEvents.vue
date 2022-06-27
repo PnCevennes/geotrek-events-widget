@@ -11,11 +11,21 @@
           </v-card-title>
         </v-img>
         <v-card-text>
-          <v-timeline align-top dense>
-            <v-timeline-item v-for="event in events" :key="event.id" color="orange">
+
+          <v-progress-linear color="deep-purple accent-4" indeterminate rounded height="6"
+            v-if="loading"></v-progress-linear>
+
+          <v-timeline align-top dense v-if="!loading">
+            <v-timeline-item v-for="event in events" :key="event.id" color="orange"
+              icon="mdi-calendar-text">
               <div>
                 <div class="font-weight-normal">
-                  {{ event.begin_date }} <strong>{{ event.name.fr }}</strong>
+                  du {{ event.begin_date }} au {{ event.end_date }} <strong>{{ event.name.fr
+                  }}</strong>
+                  <a :href="gtr_url + '/event/' + event.id" target="_blank" class="ml-2"
+                    role="button">
+                    + d'info
+                  </a>
                 </div>
                 <!-- <div>{{ event.description.fr }}</div> -->
               </div>
@@ -36,7 +46,8 @@ export default {
   }),
   mounted() {
     this.gta_url = this.$route.query.gta_url || 'https://geotrek-admin.cevennes-parcnational.net';
-    this.event_api_url = `${this.gta_url}/api/v2/touristicevent/?limit=id,begin_date,name.fr`
+    this.gtr_url = this.$route.query.gta_url || 'https://destination.cevennes-parcnational.fr';
+    this.event_api_url = `${this.gta_url}/api/v2/touristicevent/?limit=id,begin_date,end_date,name.fr`
 
     this.getEvents();
   },
