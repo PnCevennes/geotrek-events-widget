@@ -42,7 +42,9 @@ export default {
   data: () => ({
     events: [],
     eventsStore: [],
-    loading: true
+    display_nb: undefined, // Nb de données à afficher
+    loading: true,
+    other_query_params: {}, // Parametres d'appel à l'API v2
   }),
   mounted() {
 
@@ -50,15 +52,18 @@ export default {
     this.gta_url = this.$route.query.gta_url || 'https://geotrek-admin.cevennes-parcnational.net';
     this.gtr_url = this.$route.query.gtr_url || 'https://destination.cevennes-parcnational.fr';
     this.event_api_url = `${this.gta_url}/api/v2/touristicevent/?limit=id,begin_date,end_date,name.fr`
-    this.other_query_params = {}
 
 
     if (this.$route.query.nb_days) {
-      var dates_after = new Date();
-      var dates_before = new Date();
+      const dates_after = new Date();
+      let dates_before = new Date();
       dates_before.setDate(dates_after.getDate() + parseInt(this.$route.query.nb_days));
-      this.other_query_params['dates_after'] = dates_after.toISOString().split('T')[0]
-      this.other_query_params['dates_before'] = dates_before.toISOString().split('T')[0]
+      this.other_query_params['dates_after'] = dates_after.toISOString().split('T')[0];
+      this.other_query_params['dates_before'] = dates_before.toISOString().split('T')[0];
+    }
+
+    if (this.$route.query.display_nb) {
+      this.display_nb = this.$route.query.display_nb;
     }
 
     [
@@ -85,6 +90,9 @@ export default {
         this.events = this.eventsStore.map(obj => {
           return { ...obj, date: new Date(obj.begin_date) };
         }).sort((a, b) => Number(a.date) - Number(b.date));
+
+        // Subset
+        this.events = this.events.slice(0, this.display_nb || -1);
       }
     }
   },
