@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row justify="space-around">
-      <v-card width="400" class="px-0">
+      <v-card width="400" class="pa-0">
         <v-img height="200px" v-if="widget_header"
           src="https://cdn.pixabay.com/photo/2020/07/12/07/47/bee-5396362_1280.jpg">
           <v-card-title class="white--text mt-8">
@@ -11,52 +11,35 @@
           </v-card-title>
         </v-img>
 
-        <v-card-text class="px-0">
+        <v-card-text class="pa-0">
           <v-progress-linear color="deep-purple accent-4" indeterminate rounded height="6"
             v-if="loading"></v-progress-linear>
           <a v-for="event in events" :key="event.id" class="mb-3" v-else
             :href="gtr_url + '/event/' + event.id" target="_blank">
-            <v-card class="mx-auto d-flex align-end flex-column" outlined>
-              <v-card-text class="pa-0">
 
-                <v-list-item three-line>
-                  <v-list-item-avatar tile size="80" color="grey">
-                    <v-img :src="get_thumb((event['attachments'] || []))"></v-img>
-                  </v-list-item-avatar>
-                  <v-list-item-content>
-                    <div class="mb-2">
-                      <v-icon class='material-icons-round' :color="evt_color">{{ evt_icone }}
-                      </v-icon>
-                      <strong>{{ event.name.fr }}</strong>
-                    </div>
-                    <span v-if="event.begin_date_f !== event.end_date_f">
-                      du {{ event.begin_date_f }} au {{ event.end_date_f }} </span>
-                    <span v-else>le {{ event.begin_date_f }} </span>
-                  </v-list-item-content>
-                </v-list-item>
-              </v-card-text>
-            </v-card>
-
+            <v-hover v-slot="{ hover }">
+              <v-card class="mx-auto d-flex align-end flex-column card-hover" outlined
+                :elevation="hover ? 24 : 0" :class="{ 'on-hover': hover }">
+                <v-card-text class="pa-0">
+                  <v-list-item three-line>
+                    <v-list-item-avatar tile size="80" color="grey">
+                      <v-img :src="get_thumb((event['attachments'] || []))"></v-img>
+                    </v-list-item-avatar>
+                    <v-list-item-content>
+                      <div class="mb-2">
+                        <v-icon class='material-icons-round' :color="evt_color">{{ evt_icone }}
+                        </v-icon>
+                        <strong>{{ event.name.fr }}</strong>
+                      </div>
+                      <span v-if="event.begin_date_f !== event.end_date_f">
+                        du {{ event.begin_date_f }} au {{ event.end_date_f }} </span>
+                      <span v-else>le {{ event.begin_date_f }} </span>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-card-text>
+              </v-card>
+            </v-hover>
           </a>
-          <!-- <v-timeline align-top dense >
-            <v-timeline-item v-for="event in events" :key="event.id" :color="evt_color"
-              :icon="evt_icone">
-              <div>
-                <div class="font-weight-normal">
-
-                  <strong>{{ event.name.fr }}</strong>
-                  <div v-if=" event.begin_date_f !==  event.end_date_f ">
-                    du {{ event.begin_date_f }} au {{ event.end_date_f }} </div>
-                  <div v-else>le {{ event.begin_date_f }} </div>
-                  <a :href="gtr_url + '/event/' + event.id" target="_blank" class="ml-2"
-                    role="button">
-                    + d'info
-                  </a>
-                </div>
-                <div>{{ event.description.fr }}</div>
-          </div>
-          </v-timeline-item>
-          </v-timeline> -->
         </v-card-text>
       </v-card>
     </v-row>
@@ -195,8 +178,14 @@ export default {
 <style scoped>
 a {
   color: inherit;
-  /* blue colors for links too */
   text-decoration: inherit;
-  /* no underline */
+}
+
+.v-card:not(.on-hover) {
+  opacity: 0.9;
+}
+
+.card-hover:hover {
+  border: thick solid rgba(0, 0, 0, 0.12)
 }
 </style>
