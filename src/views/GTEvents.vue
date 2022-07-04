@@ -16,20 +16,21 @@
             v-if="loading"></v-progress-linear>
           <a v-for="event in events" :key="event.id" class="mb-3" v-else
             :href="gtr_url + '/event/' + event.id" target="_blank">
-
             <v-hover v-slot="{ hover }">
               <v-card class="mx-auto d-flex align-end flex-column card-hover" outlined
                 :elevation="hover ? 24 : 0" :class="{ 'on-hover': hover }">
                 <v-card-text class="pa-0">
-                  <v-list-item three-line>
-                    <v-list-item-avatar tile size="80" color="grey">
+                  <v-list-item three-line class="px-1">
+                    <v-list-item-avatar tile size="80" class="my-1" color="grey">
                       <v-img :src="get_thumb((event['attachments'] || []))"></v-img>
                     </v-list-item-avatar>
-                    <v-list-item-content>
-                      <div class="mb-2">
-                        <v-icon class='material-icons-round' :color="evt_color">{{ evt_icone }}
-                        </v-icon>
-                        <strong>{{ event.name.fr }}</strong>
+                    <v-list-item-content class="py-0">
+                      <div>
+                        <v-avatar :color="evt_color" size="32px" class="mr-1">
+                          <img :src="eventsType[event.type].picto"
+                            :title="eventsType[event.type].name">
+                        </v-avatar>
+                        <strong>{{ event.name.fr }} </strong>
                       </div>
                       <span v-if="event.begin_date_f !== event.end_date_f">
                         du {{ event.begin_date_f }} au {{ event.end_date_f }} </span>
@@ -50,6 +51,7 @@
 export default {
   data: () => ({
     events: [],
+    eventsType: {},
     eventsStore: [],
     display_nb: undefined, // Nb de données à afficher
     loading: true,
@@ -63,7 +65,7 @@ export default {
     // Traitement des paramètres d'url
     this.gta_url = this.$route.query.gta_url || 'https://geotrek-admin.cevennes-parcnational.net';
     this.gtr_url = this.$route.query.gtr_url || 'https://destination.cevennes-parcnational.fr';
-    this.event_api_url = `${this.gta_url}/api/v2/touristicevent/?fields=id,begin_date,end_date,name,attachments`
+    this.event_api_url = `${this.gta_url}/api/v2/touristicevent/?fields=id,begin_date,end_date,type,name,attachments`
 
     this.evt_icone = this.$route.query.icone || 'mdi-calendar-text';
     // https://materialdesignicons.com/
@@ -121,8 +123,6 @@ export default {
             end_date_f: new Date(obj.end_date).toLocaleDateString()
           };
         });
-
-        console.log(this.events);
       }
     }
   },
@@ -132,15 +132,6 @@ export default {
         return attachments[0].thumbnail;
       }
       return undefined;
-    },
-    processEventData(data) {
-      this.eventsStore.push(...data.results);
-      if (data.next) {
-        this.requestNextPage(data.next);
-      }
-      else {
-        this.loading = false;
-      }
     },
 
     requestNextPage(urlNext) {
@@ -158,6 +149,32 @@ export default {
         });
     },
 
+    processEventData(data) {
+      this.eventsStore.push(...data.results);
+      if (data.next) {
+        this.requestNextPage(data.next);
+      }
+      else {
+        this.getEventsType();
+      }
+    },
+
+    getEventsType() {
+      fetch(this.gta_url + '/api/v2/touristicevent_type')
+        .then(response => {
+          return response.json();
+        })
+        .then(data => {
+          data.results.forEach(type => {
+            this.eventsType[type.id] = {
+              'picto': type.pictogram,
+              'name': type.type.fr
+            }
+          });
+          console.log(this.eventsType)
+          this.loading = false;
+        });
+    },
     getEvents() {
       const queryString = Object.keys(this.gta_query_params).map((key) => {
         return encodeURIComponent(key) + '=' + encodeURIComponent(this.gta_query_params[key])
@@ -181,11 +198,11 @@ a {
   text-decoration: inherit;
 }
 
-.v-card:not(.on-hover) {
+.card-hove:not(.on-hover) {
   opacity: 0.9;
 }
-
-.card-hover:hover {
-  border: thick solid rgba(0, 0, 0, 0.12)
+.colorize-orange {
+  -webkit-filter: hue-rotate(40deg) saturate(0.5) brightness(390%) saturate(4);
+  filter: hue-rotate(40deg) saturate(0.5) brightness(390%) saturate(4);
 }
 </style>
