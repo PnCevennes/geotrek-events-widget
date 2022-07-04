@@ -12,8 +12,6 @@ Usage : https://pncevennes.github.io/geotrek-events-widget
 | ----------- |-----------| ----------- |
 | gtr_url     |  url      | Url de geotrek-admin       |
 | gta_url     |  url      | Url de geotrek-rando        |
-| evt_icone     |  string      | Icone : https://materialdesignicons.com/        |
-| color     |  string      | Couleur        |
 
 **Style**
 
