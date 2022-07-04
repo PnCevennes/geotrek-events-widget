@@ -14,25 +14,42 @@
         <v-card-text>
           <v-progress-linear color="deep-purple accent-4" indeterminate rounded height="6"
             v-if="loading"></v-progress-linear>
-
-          <v-timeline align-top dense v-if="!loading">
+          <v-row v-for="event in events" :key="event.id" :color="evt_color" v-else
+            :icon="evt_icone">
+            <v-col cols="2">
+              <v-btn class="mx-1" color="orange" fab dark small>
+                <v-icon class='material-icons-round'>mdi-calendar-text</v-icon>
+              </v-btn>
+            </v-col>
+            <v-col>
+              <strong>{{ event.name.fr }}</strong>
+              <div v-if=" event.begin_date_f !==  event.end_date_f ">
+                du {{ event.begin_date_f }} au {{ event.end_date_f }} </div>
+              <div v-else>le {{ event.begin_date_f }} </div>
+              <a :href="gtr_url + '/event/' + event.id" target="_blank" class="ml-2" role="button">
+                + d'info
+              </a>
+            </v-col>
+          </v-row>
+          <!-- <v-timeline align-top dense >
             <v-timeline-item v-for="event in events" :key="event.id" :color="evt_color"
               :icon="evt_icone">
               <div>
                 <div class="font-weight-normal">
-                  <span v-if=" event.begin_date_f !==  event.end_date_f ">
-                    du {{ event.begin_date_f }} au {{ event.end_date_f }} </span>
-                  <span v-else>le {{ event.begin_date_f }} </span>
+
                   <strong>{{ event.name.fr }}</strong>
+                  <div v-if=" event.begin_date_f !==  event.end_date_f ">
+                    du {{ event.begin_date_f }} au {{ event.end_date_f }} </div>
+                  <div v-else>le {{ event.begin_date_f }} </div>
                   <a :href="gtr_url + '/event/' + event.id" target="_blank" class="ml-2"
                     role="button">
                     + d'info
                   </a>
                 </div>
-                <!-- <div>{{ event.description.fr }}</div> -->
-              </div>
-            </v-timeline-item>
-          </v-timeline>
+                <div>{{ event.description.fr }}</div>
+          </div>
+          </v-timeline-item>
+          </v-timeline> -->
         </v-card-text>
       </v-card>
     </v-row>
@@ -161,3 +178,117 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.timeline {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.timeline::after {
+  content: "";
+  position: absolute;
+  width: 3px;
+  background-color: white;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  margin-left: -2px;
+}
+
+.timeline-item {
+  padding: 10px 40px;
+  position: relative;
+  background-color: inherit;
+  width: 50%;
+}
+
+.timeline-item::after {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  right: -9px;
+  background-color: #4caf50;
+  border: 2px solid #fff;
+  top: 22px;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.left {
+  left: 0;
+}
+
+.right {
+  left: 50%;
+}
+
+.left::before {
+  content: " ";
+  height: 0;
+  position: absolute;
+  top: 22px;
+  width: 0;
+  z-index: 1;
+  right: 30px;
+  border: medium solid white;
+  border-width: 10px 0 10px 10px;
+  border-color: transparent transparent transparent white;
+}
+
+.right::before {
+  content: " ";
+  height: 0;
+  position: absolute;
+  top: 22px;
+  width: 0;
+  z-index: 1;
+  left: 30px;
+  border: medium solid white;
+  border-width: 10px 10px 10px 0;
+  border-color: transparent white transparent transparent;
+}
+
+.right::after {
+  left: -10px;
+}
+
+.content {
+  padding: 20px 30px;
+  background-color: white;
+  position: relative;
+  border-radius: 6px;
+}
+
+/* Responsive on screens less than 600px wide */
+@media screen and (max-width: 600px) {
+  .timeline::after {
+    left: 31px;
+  }
+
+  .timeline-item {
+    width: 100%;
+    padding-left: 70px;
+    padding-right: 25px;
+  }
+
+  .timeline-item::before {
+    left: 60px;
+    border: medium solid white;
+    border-width: 10px 10px 10px 0;
+    border-color: transparent white transparent transparent;
+  }
+
+  .left::after,
+  .right::after {
+    left: 21px;
+  }
+
+  .right {
+    left: 0%;
+  }
+}
+
+</style>
