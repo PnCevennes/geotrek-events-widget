@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row justify="space-around">
-      <v-card width="400">
+      <v-card width="400" class="px-0">
         <v-img height="200px" v-if="widget_header"
           src="https://cdn.pixabay.com/photo/2020/07/12/07/47/bee-5396362_1280.jpg">
           <v-card-title class="white--text mt-8">
@@ -11,33 +11,33 @@
           </v-card-title>
         </v-img>
 
-        <v-card-text>
+        <v-card-text class="px-0">
           <v-progress-linear color="deep-purple accent-4" indeterminate rounded height="6"
             v-if="loading"></v-progress-linear>
-          <div v-for="event in events" :key="event.id" class="mb-3" v-else>
+          <a v-for="event in events" :key="event.id" class="mb-3" v-else
+            :href="gtr_url + '/event/' + event.id" target="_blank">
             <v-card class="mx-auto d-flex align-end flex-column" outlined>
-              <v-list-item two-line>
-                <v-list-item-content class="pb-0">
-                  <div class="text-h6 mb-2">
-                    <v-btn class="mx-1" :color="evt_color" fab dark small>
-                      <v-icon class='material-icons-round'>{{evt_icone}}</v-icon>
-                    </v-btn>{{ event.name.fr }}
-                  </div>
-                  <v-list-item-subtitle>
-                    <span v-if=" event.begin_date_f !==  event.end_date_f ">
+              <v-card-text class="pa-0">
+
+                <v-list-item three-line>
+                  <v-list-item-avatar tile size="80" color="grey">
+                    <v-img :src="get_thumb((event['attachments'] || []))"></v-img>
+                  </v-list-item-avatar>
+                  <v-list-item-content>
+                    <div class="mb-2">
+                      <v-icon class='material-icons-round' :color="evt_color">{{ evt_icone }}
+                      </v-icon>
+                      <strong>{{ event.name.fr }}</strong>
+                    </div>
+                    <span v-if="event.begin_date_f !== event.end_date_f">
                       du {{ event.begin_date_f }} au {{ event.end_date_f }} </span>
                     <span v-else>le {{ event.begin_date_f }} </span>
-                  </v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-              <v-card-actions>
-                <v-btn :href="gtr_url + '/event/' + event.id" target="_blank">
-                  + d'info
-                </v-btn>
-              </v-card-actions>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-card-text>
             </v-card>
 
-          </div>
+          </a>
           <!-- <v-timeline align-top dense >
             <v-timeline-item v-for="event in events" :key="event.id" :color="evt_color"
               :icon="evt_icone">
@@ -80,7 +80,7 @@ export default {
     // Traitement des paramètres d'url
     this.gta_url = this.$route.query.gta_url || 'https://geotrek-admin.cevennes-parcnational.net';
     this.gtr_url = this.$route.query.gtr_url || 'https://destination.cevennes-parcnational.fr';
-    this.event_api_url = `${this.gta_url}/api/v2/touristicevent/?fields=id,begin_date,end_date,name`
+    this.event_api_url = `${this.gta_url}/api/v2/touristicevent/?fields=id,begin_date,end_date,name,attachments`
 
     this.evt_icone = this.$route.query.icone || 'mdi-calendar-text';
     // https://materialdesignicons.com/
@@ -144,6 +144,12 @@ export default {
     }
   },
   methods: {
+    get_thumb(attachments) {
+      if (attachments.length > 0) {
+        return attachments[0].thumbnail;
+      }
+      return undefined;
+    },
     processEventData(data) {
       this.eventsStore.push(...data.results);
       if (data.next) {
@@ -187,115 +193,10 @@ export default {
 </script>
 
 <style scoped>
-.timeline {
-  position: relative;
-  max-width: 1200px;
-  margin: 0 auto;
+a {
+  color: inherit;
+  /* blue colors for links too */
+  text-decoration: inherit;
+  /* no underline */
 }
-
-.timeline::after {
-  content: "";
-  position: absolute;
-  width: 3px;
-  background-color: white;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  margin-left: -2px;
-}
-
-.timeline-item {
-  padding: 10px 40px;
-  position: relative;
-  background-color: inherit;
-  width: 50%;
-}
-
-.timeline-item::after {
-  content: "";
-  position: absolute;
-  width: 15px;
-  height: 15px;
-  right: -9px;
-  background-color: #4caf50;
-  border: 2px solid #fff;
-  top: 22px;
-  border-radius: 50%;
-  z-index: 1;
-}
-
-.left {
-  left: 0;
-}
-
-.right {
-  left: 50%;
-}
-
-.left::before {
-  content: " ";
-  height: 0;
-  position: absolute;
-  top: 22px;
-  width: 0;
-  z-index: 1;
-  right: 30px;
-  border: medium solid white;
-  border-width: 10px 0 10px 10px;
-  border-color: transparent transparent transparent white;
-}
-
-.right::before {
-  content: " ";
-  height: 0;
-  position: absolute;
-  top: 22px;
-  width: 0;
-  z-index: 1;
-  left: 30px;
-  border: medium solid white;
-  border-width: 10px 10px 10px 0;
-  border-color: transparent white transparent transparent;
-}
-
-.right::after {
-  left: -10px;
-}
-
-.content {
-  padding: 20px 30px;
-  background-color: white;
-  position: relative;
-  border-radius: 6px;
-}
-
-/* Responsive on screens less than 600px wide */
-@media screen and (max-width: 600px) {
-  .timeline::after {
-    left: 31px;
-  }
-
-  .timeline-item {
-    width: 100%;
-    padding-left: 70px;
-    padding-right: 25px;
-  }
-
-  .timeline-item::before {
-    left: 60px;
-    border: medium solid white;
-    border-width: 10px 10px 10px 0;
-    border-color: transparent white transparent transparent;
-  }
-
-  .left::after,
-  .right::after {
-    left: 21px;
-  }
-
-  .right {
-    left: 0%;
-  }
-}
-
 </style>
