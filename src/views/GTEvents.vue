@@ -20,8 +20,10 @@
               :icon="evt_icone">
               <div>
                 <div class="font-weight-normal">
-                  du {{ event.begin_date }} au {{ event.end_date }} <strong>{{ event.name.fr
-                    }}</strong>
+                  <span v-if=" event.begin_date_f !==  event.end_date_f ">
+                    du {{ event.begin_date_f }} au {{ event.end_date_f }} </span>
+                  <span v-else>le {{ event.begin_date_f }} </span>
+                  <strong>{{ event.name.fr }}</strong>
                   <a :href="gtr_url + '/event/' + event.id" target="_blank" class="ml-2"
                     role="button">
                     + d'info
@@ -54,7 +56,7 @@ export default {
     // Traitement des paramètres d'url
     this.gta_url = this.$route.query.gta_url || 'https://geotrek-admin.cevennes-parcnational.net';
     this.gtr_url = this.$route.query.gtr_url || 'https://destination.cevennes-parcnational.fr';
-    this.event_api_url = `${this.gta_url}/api/v2/touristicevent/?limit=id,begin_date,end_date,name.fr`
+    this.event_api_url = `${this.gta_url}/api/v2/touristicevent/?fields=id,begin_date,end_date,name`
 
     this.evt_icone = this.$route.query.icone || 'mdi-calendar-text';
     // https://materialdesignicons.com/
@@ -70,7 +72,7 @@ export default {
       this.gta_query_params['dates_before'] = dates_before.toISOString().split('T')[0];
     }
 
-    this.widget_header = (this.$route.query.widget_header !== 'false') ? true : false;
+    this.widget_header = (this.$route.query.widget_header !== 'true') ? false : true;
 
     if (this.$route.query.display_nb) {
       this.display_nb = this.$route.query.display_nb;
@@ -101,8 +103,19 @@ export default {
           return { ...obj, date: new Date(obj.begin_date) };
         }).sort((a, b) => Number(a.date) - Number(b.date));
 
+        // Format date
         // Subset
         this.events = this.events.slice(0, this.display_nb || -1);
+
+        this.events = this.events.map(obj => {
+          return {
+            ...obj,
+            begin_date_f: new Date(obj.begin_date).toLocaleDateString(),
+            end_date_f: new Date(obj.end_date).toLocaleDateString()
+          };
+        });
+
+        console.log(this.events);
       }
     }
   },
