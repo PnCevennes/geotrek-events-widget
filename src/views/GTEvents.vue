@@ -14,23 +14,30 @@
         <v-card-text>
           <v-progress-linear color="deep-purple accent-4" indeterminate rounded height="6"
             v-if="loading"></v-progress-linear>
-          <v-row v-for="event in events" :key="event.id" :color="evt_color" v-else
-            :icon="evt_icone">
-            <v-col cols="2">
-              <v-btn class="mx-1" color="orange" fab dark small>
-                <v-icon class='material-icons-round'>mdi-calendar-text</v-icon>
-              </v-btn>
-            </v-col>
-            <v-col>
-              <strong>{{ event.name.fr }}</strong>
-              <div v-if=" event.begin_date_f !==  event.end_date_f ">
-                du {{ event.begin_date_f }} au {{ event.end_date_f }} </div>
-              <div v-else>le {{ event.begin_date_f }} </div>
-              <a :href="gtr_url + '/event/' + event.id" target="_blank" class="ml-2" role="button">
-                + d'info
-              </a>
-            </v-col>
-          </v-row>
+          <div v-for="event in events" :key="event.id" class="mb-3" v-else>
+            <v-card class="mx-auto d-flex align-end flex-column" outlined>
+              <v-list-item two-line>
+                <v-list-item-content class="pb-0">
+                  <div class="text-h6 mb-2">
+                    <v-btn class="mx-1" :color="evt_color" fab dark small>
+                      <v-icon class='material-icons-round'>{{evt_icone}}</v-icon>
+                    </v-btn>{{ event.name.fr }}
+                  </div>
+                  <v-list-item-subtitle>
+                    <span v-if=" event.begin_date_f !==  event.end_date_f ">
+                      du {{ event.begin_date_f }} au {{ event.end_date_f }} </span>
+                    <span v-else>le {{ event.begin_date_f }} </span>
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+              <v-card-actions>
+                <v-btn :href="gtr_url + '/event/' + event.id" target="_blank">
+                  + d'info
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+
+          </div>
           <!-- <v-timeline align-top dense >
             <v-timeline-item v-for="event in events" :key="event.id" :color="evt_color"
               :icon="evt_icone">
