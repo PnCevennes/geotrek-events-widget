@@ -114,8 +114,9 @@ export default {
 
         // Format date
         // Subset
-        this.events = this.events.slice(0, this.display_nb || -1);
-
+        if (this.display_nb) {
+          this.events = this.events.slice(0, this.display_nb);
+        }
         this.events = this.events.map(obj => {
           return {
             ...obj,
